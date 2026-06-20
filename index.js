@@ -1,65 +1,85 @@
 "use strict";
-const getCodePoint = (character) => character.codePointAt(0);
-const first = (x) => x[0];
-const last = (x) => x[x.length - 1];
-function toCodePoints(input) {
-    const codepoints = [];
-    const size = input.length;
-    for (let i = 0; i < size; i += 1) {
-        const before = input.charCodeAt(i);
-        if (before >= 0xd800 && before <= 0xdbff && size > i + 1) {
-            const next = input.charCodeAt(i + 1);
-            if (next >= 0xdc00 && next <= 0xdfff) {
-                codepoints.push((before - 0xd800) * 0x400 + next - 0xdc00 + 0x10000);
-                i += 1;
-                continue;
-            }
-        }
-        codepoints.push(before);
-    }
-    return codepoints;
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = parser;
+function _parser() {
+  const data = require("@babel/parser");
+  _parser = function () {
+    return data;
+  };
+  return data;
 }
-function saslprep({ unassigned_code_points, commonly_mapped_to_nothing, non_ASCII_space_characters, prohibited_characters, bidirectional_r_al, bidirectional_l, }, input, opts = {}) {
-    const mapping2space = non_ASCII_space_characters;
-    const mapping2nothing = commonly_mapped_to_nothing;
-    if (typeof input !== 'string') {
-        throw new TypeError('Expected string.');
-    }
-    if (input.length === 0) {
-        return '';
-    }
-    const mapped_input = toCodePoints(input)
-        .map((character) => (mapping2space.get(character) ? 0x20 : character))
-        .filter((character) => !mapping2nothing.get(character));
-    const normalized_input = String.fromCodePoint
-        .apply(null, mapped_input)
-        .normalize('NFKC');
-    const normalized_map = toCodePoints(normalized_input);
-    const hasProhibited = normalized_map.some((character) => prohibited_characters.get(character));
-    if (hasProhibited) {
-        throw new Error('Prohibited character, see https://tools.ietf.org/html/rfc4013#section-2.3');
-    }
-    if (opts.allowUnassigned !== true) {
-        const hasUnassigned = normalized_map.some((character) => unassigned_code_points.get(character));
-        if (hasUnassigned) {
-            throw new Error('Unassigned code point, see https://tools.ietf.org/html/rfc4013#section-2.5');
-        }
-    }
-    const hasBidiRAL = normalized_map.some((character) => bidirectional_r_al.get(character));
-    const hasBidiL = normalized_map.some((character) => bidirectional_l.get(character));
-    if (hasBidiRAL && hasBidiL) {
-        throw new Error('String must not contain RandALCat and LCat at the same time,' +
-            ' see https://tools.ietf.org/html/rfc3454#section-6');
-    }
-    const isFirstBidiRAL = bidirectional_r_al.get(getCodePoint(first(normalized_input)));
-    const isLastBidiRAL = bidirectional_r_al.get(getCodePoint(last(normalized_input)));
-    if (hasBidiRAL && !(isFirstBidiRAL && isLastBidiRAL)) {
-        throw new Error('Bidirectional RandALCat character must be the first and the last' +
-            ' character of the string, see https://tools.ietf.org/html/rfc3454#section-6');
-    }
-    return normalized_input;
+function _codeFrame() {
+  const data = require("@babel/code-frame");
+  _codeFrame = function () {
+    return data;
+  };
+  return data;
 }
-saslprep.saslprep = saslprep;
-saslprep.default = saslprep;
-module.exports = saslprep;
+var _missingPluginHelper = require("./util/missing-plugin-helper.js");
+function* parser(pluginPasses, {
+  parserOpts,
+  highlightCode = true,
+  filename = "unknown"
+}, code) {
+  try {
+    const results = [];
+    for (const plugins of pluginPasses) {
+      for (const plugin of plugins) {
+        const {
+          parserOverride
+        } = plugin;
+        if (parserOverride) {
+          const ast = parserOverride(code, parserOpts, _parser().parse);
+          if (ast !== undefined) results.push(ast);
+        }
+      }
+    }
+    if (results.length === 0) {
+      return (0, _parser().parse)(code, parserOpts);
+    } else if (results.length === 1) {
+      yield* [];
+      if (typeof results[0].then === "function") {
+        throw new Error(`You appear to be using an async parser plugin, ` + `which your current version of Babel does not support. ` + `If you're using a published plugin, you may need to upgrade ` + `your @babel/core version.`);
+      }
+      return results[0];
+    }
+    throw new Error("More than one plugin attempted to override parsing.");
+  } catch (err) {
+    if (err.code === "BABEL_PARSER_SOURCETYPE_MODULE_REQUIRED") {
+      err.message += "\nConsider renaming the file to '.mjs', or setting sourceType:module " + "or sourceType:unambiguous in your Babel config for this file.";
+    }
+    const startLine = parserOpts == null ? void 0 : parserOpts.startLine;
+    const startColumn = parserOpts == null ? void 0 : parserOpts.startColumn;
+    if (startColumn != null) {
+      code = " ".repeat(startColumn) + code;
+    }
+    const {
+      loc,
+      missingPlugin
+    } = err;
+    if (loc) {
+      const codeFrame = (0, _codeFrame().codeFrameColumns)(code, {
+        start: {
+          line: loc.line,
+          column: loc.column + 1
+        }
+      }, {
+        highlightCode,
+        startLine
+      });
+      if (missingPlugin) {
+        err.message = `${filename}: ` + (0, _missingPluginHelper.default)(missingPlugin[0], loc, codeFrame, filename);
+      } else {
+        err.message = `${filename}: ${err.message}\n\n` + codeFrame;
+      }
+      err.code = "BABEL_PARSE_ERROR";
+    }
+    throw err;
+  }
+}
+0 && 0;
+
 //# sourceMappingURL=index.js.map
