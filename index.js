@@ -3,7 +3,188 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = parser;
+exports.DEFAULT_EXTENSIONS = void 0;
+Object.defineProperty(exports, "File", {
+  enumerable: true,
+  get: function () {
+    return _file.default;
+  }
+});
+Object.defineProperty(exports, "buildExternalHelpers", {
+  enumerable: true,
+  get: function () {
+    return _buildExternalHelpers.default;
+  }
+});
+Object.defineProperty(exports, "createConfigItem", {
+  enumerable: true,
+  get: function () {
+    return _index2.createConfigItem;
+  }
+});
+Object.defineProperty(exports, "createConfigItemAsync", {
+  enumerable: true,
+  get: function () {
+    return _index2.createConfigItemAsync;
+  }
+});
+Object.defineProperty(exports, "createConfigItemSync", {
+  enumerable: true,
+  get: function () {
+    return _index2.createConfigItemSync;
+  }
+});
+Object.defineProperty(exports, "getEnv", {
+  enumerable: true,
+  get: function () {
+    return _environment.getEnv;
+  }
+});
+Object.defineProperty(exports, "loadOptions", {
+  enumerable: true,
+  get: function () {
+    return _index2.loadOptions;
+  }
+});
+Object.defineProperty(exports, "loadOptionsAsync", {
+  enumerable: true,
+  get: function () {
+    return _index2.loadOptionsAsync;
+  }
+});
+Object.defineProperty(exports, "loadOptionsSync", {
+  enumerable: true,
+  get: function () {
+    return _index2.loadOptionsSync;
+  }
+});
+Object.defineProperty(exports, "loadPartialConfig", {
+  enumerable: true,
+  get: function () {
+    return _index2.loadPartialConfig;
+  }
+});
+Object.defineProperty(exports, "loadPartialConfigAsync", {
+  enumerable: true,
+  get: function () {
+    return _index2.loadPartialConfigAsync;
+  }
+});
+Object.defineProperty(exports, "loadPartialConfigSync", {
+  enumerable: true,
+  get: function () {
+    return _index2.loadPartialConfigSync;
+  }
+});
+Object.defineProperty(exports, "parse", {
+  enumerable: true,
+  get: function () {
+    return _parse.parse;
+  }
+});
+Object.defineProperty(exports, "parseAsync", {
+  enumerable: true,
+  get: function () {
+    return _parse.parseAsync;
+  }
+});
+Object.defineProperty(exports, "parseSync", {
+  enumerable: true,
+  get: function () {
+    return _parse.parseSync;
+  }
+});
+exports.resolvePreset = exports.resolvePlugin = void 0;
+Object.defineProperty((0, exports), "template", {
+  enumerable: true,
+  get: function () {
+    return _template().default;
+  }
+});
+Object.defineProperty((0, exports), "tokTypes", {
+  enumerable: true,
+  get: function () {
+    return _parser().tokTypes;
+  }
+});
+Object.defineProperty(exports, "transform", {
+  enumerable: true,
+  get: function () {
+    return _transform.transform;
+  }
+});
+Object.defineProperty(exports, "transformAsync", {
+  enumerable: true,
+  get: function () {
+    return _transform.transformAsync;
+  }
+});
+Object.defineProperty(exports, "transformFile", {
+  enumerable: true,
+  get: function () {
+    return _transformFile.transformFile;
+  }
+});
+Object.defineProperty(exports, "transformFileAsync", {
+  enumerable: true,
+  get: function () {
+    return _transformFile.transformFileAsync;
+  }
+});
+Object.defineProperty(exports, "transformFileSync", {
+  enumerable: true,
+  get: function () {
+    return _transformFile.transformFileSync;
+  }
+});
+Object.defineProperty(exports, "transformFromAst", {
+  enumerable: true,
+  get: function () {
+    return _transformAst.transformFromAst;
+  }
+});
+Object.defineProperty(exports, "transformFromAstAsync", {
+  enumerable: true,
+  get: function () {
+    return _transformAst.transformFromAstAsync;
+  }
+});
+Object.defineProperty(exports, "transformFromAstSync", {
+  enumerable: true,
+  get: function () {
+    return _transformAst.transformFromAstSync;
+  }
+});
+Object.defineProperty(exports, "transformSync", {
+  enumerable: true,
+  get: function () {
+    return _transform.transformSync;
+  }
+});
+Object.defineProperty((0, exports), "traverse", {
+  enumerable: true,
+  get: function () {
+    return _traverse().default;
+  }
+});
+exports.version = exports.types = void 0;
+var _file = require("./transformation/file/file.js");
+var _buildExternalHelpers = require("./tools/build-external-helpers.js");
+var resolvers = require("./config/files/index.js");
+var _environment = require("./config/helpers/environment.js");
+function _types() {
+  const data = require("@babel/types");
+  _types = function () {
+    return data;
+  };
+  return data;
+}
+Object.defineProperty((0, exports), "types", {
+  enumerable: true,
+  get: function () {
+    return _types();
+  }
+});
 function _parser() {
   const data = require("@babel/parser");
   _parser = function () {
@@ -11,75 +192,39 @@ function _parser() {
   };
   return data;
 }
-function _codeFrame() {
-  const data = require("@babel/code-frame");
-  _codeFrame = function () {
+function _traverse() {
+  const data = require("@babel/traverse");
+  _traverse = function () {
     return data;
   };
   return data;
 }
-var _missingPluginHelper = require("./util/missing-plugin-helper.js");
-function* parser(pluginPasses, {
-  parserOpts,
-  highlightCode = true,
-  filename = "unknown"
-}, code) {
-  try {
-    const results = [];
-    for (const plugins of pluginPasses) {
-      for (const plugin of plugins) {
-        const {
-          parserOverride
-        } = plugin;
-        if (parserOverride) {
-          const ast = parserOverride(code, parserOpts, _parser().parse);
-          if (ast !== undefined) results.push(ast);
-        }
-      }
-    }
-    if (results.length === 0) {
-      return (0, _parser().parse)(code, parserOpts);
-    } else if (results.length === 1) {
-      yield* [];
-      if (typeof results[0].then === "function") {
-        throw new Error(`You appear to be using an async parser plugin, ` + `which your current version of Babel does not support. ` + `If you're using a published plugin, you may need to upgrade ` + `your @babel/core version.`);
-      }
-      return results[0];
-    }
-    throw new Error("More than one plugin attempted to override parsing.");
-  } catch (err) {
-    if (err.code === "BABEL_PARSER_SOURCETYPE_MODULE_REQUIRED") {
-      err.message += "\nConsider renaming the file to '.mjs', or setting sourceType:module " + "or sourceType:unambiguous in your Babel config for this file.";
-    }
-    const startLine = parserOpts == null ? void 0 : parserOpts.startLine;
-    const startColumn = parserOpts == null ? void 0 : parserOpts.startColumn;
-    if (startColumn != null) {
-      code = " ".repeat(startColumn) + code;
-    }
-    const {
-      loc,
-      missingPlugin
-    } = err;
-    if (loc) {
-      const codeFrame = (0, _codeFrame().codeFrameColumns)(code, {
-        start: {
-          line: loc.line,
-          column: loc.column + 1
-        }
-      }, {
-        highlightCode,
-        startLine
-      });
-      if (missingPlugin) {
-        err.message = `${filename}: ` + (0, _missingPluginHelper.default)(missingPlugin[0], loc, codeFrame, filename);
-      } else {
-        err.message = `${filename}: ${err.message}\n\n` + codeFrame;
-      }
-      err.code = "BABEL_PARSE_ERROR";
-    }
-    throw err;
-  }
+function _template() {
+  const data = require("@babel/template");
+  _template = function () {
+    return data;
+  };
+  return data;
 }
-0 && 0;
+var _index2 = require("./config/index.js");
+var _transform = require("./transform.js");
+var _transformFile = require("./transform-file.js");
+var _transformAst = require("./transform-ast.js");
+var _parse = require("./parse.js");
+const version = exports.version = "7.29.7";
+const resolvePlugin = (name, dirname) => resolvers.resolvePlugin(name, dirname, false).filepath;
+exports.resolvePlugin = resolvePlugin;
+const resolvePreset = (name, dirname) => resolvers.resolvePreset(name, dirname, false).filepath;
+exports.resolvePreset = resolvePreset;
+const DEFAULT_EXTENSIONS = exports.DEFAULT_EXTENSIONS = Object.freeze([".js", ".jsx", ".es6", ".es", ".mjs", ".cjs"]);
+exports.OptionManager = class OptionManager {
+  init(opts) {
+    return (0, _index2.loadOptionsSync)(opts);
+  }
+};
+exports.Plugin = function Plugin(alias) {
+  throw new Error(`The (${alias}) Babel 5 plugin is being run with an unsupported Babel version.`);
+};
+0 && (exports.types = exports.traverse = exports.tokTypes = exports.template = 0);
 
 //# sourceMappingURL=index.js.map
