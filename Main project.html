@@ -1,0 +1,358 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digital Board Game Platform</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: radial-gradient(circle at top left, #ffb3ff 0%, #99e6ff 35%, #7f7fd5 100%);
+      color: #1b0b2c;
+    }
+    header {
+      padding: 60px 24px 28px;
+      text-align: center;
+      background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.65));
+      box-shadow: 0 20px 60px rgba(27, 11, 44, 0.16);
+      border-bottom: 2px solid rgba(255,255,255,0.8);
+    }
+    header h1 {
+      margin: 0;
+      font-size: clamp(3rem, 5vw, 5rem);
+      letter-spacing: 0.08em;
+      color: #2b0055;
+    }
+    header p {
+      margin: 20px auto 0;
+      max-width: 880px;
+      font-size: 1.1rem;
+      line-height: 1.7;
+      color: #422f60;
+    }
+    .hero-tags {
+      margin: 34px auto 0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+    }
+    .tag {
+      padding: 12px 18px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.98);
+      color: #3b005a;
+      font-weight: 700;
+      box-shadow: 0 12px 20px rgba(27, 11, 44, 0.08);
+    }
+    main {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    .grid {
+      display: grid;
+      gap: 22px;
+    }
+    .grid-3 {
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.92);
+      border-radius: 28px;
+      padding: 28px;
+      border: 1px solid rgba(181, 133, 255, 0.2);
+      box-shadow: 0 22px 55px rgba(27, 11, 44, 0.1);
+    }
+    .card h2 {
+      margin-top: 0;
+      color: #600184;
+    }
+    .card p {
+      margin: 14px 0 0;
+      color: #3b1f5a;
+      line-height: 1.8;
+    }
+    .section-title {
+      font-size: clamp(2rem, 3vw, 3rem);
+      margin: 0 0 18px;
+      color: #42005a;
+      text-align: center;
+    }
+    .highlight {
+      margin: 42px 0;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 240, 255, 0.9));
+      border: 1px dashed rgba(117, 58, 140, 0.35);
+      border-radius: 24px;
+      padding: 28px;
+      text-align: center;
+      box-shadow: 0 18px 40px rgba(27, 11, 44, 0.08);
+    }
+    .highlight h2 {
+      margin: 0 0 12px;
+      color: #6d2e9e;
+    }
+    .highlight p {
+      margin: 0;
+      color: #4a1f6a;
+      font-size: 1rem;
+      line-height: 1.8;
+    }
+    .stack-grid {
+      display: grid;
+      gap: 24px;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+    .stack-card {
+      background: rgba(255, 255, 255, 0.98);
+      border-radius: 24px;
+      padding: 22px;
+      border-left: 6px solid #a456ff;
+    }
+    .stack-card h3 {
+      margin-top: 0;
+      color: #4a1369;
+    }
+    .stack-card ul {
+      padding-left: 20px;
+      margin: 12px 0 0;
+      color: #3b1f57;
+    }
+    .stack-card li {
+      margin-bottom: 10px;
+    }
+    .process {
+      display: grid;
+      gap: 20px;
+    }
+    .process-step {
+      background: rgba(255,255,255,0.96);
+      border-radius: 24px;
+      padding: 24px;
+      border: 1px solid rgba(166, 86, 255, 0.18);
+    }
+    .process-step h4 {
+      margin: 0 0 10px;
+      color: #591f7a;
+    }
+    .process-step p {
+      margin: 0;
+      color: #422e57;
+    }
+    .demo-panel {
+      display: grid;
+      gap: 20px;
+      align-items: start;
+    }
+    .demo-card {
+      background: rgba(255,255,255,0.92);
+      border-radius: 28px;
+      padding: 26px;
+      box-shadow: 0 22px 45px rgba(27, 11, 44, 0.1);
+      border: 1px solid rgba(255, 179, 255, 0.4);
+    }
+    .board-simulator {
+      width: min(560px, 100%);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 4px;
+      border: 4px solid rgba(128, 49, 190, 0.3);
+      border-radius: 24px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.85);
+    }
+    .board-cell {
+      aspect-ratio: 1 / 1;
+      display: grid;
+      place-items: center;
+      font-size: 1.1rem;
+      font-weight: 700;
+      user-select: none;
+    }
+    .board-cell.light { background: #fff0f9; }
+    .board-cell.dark { background: #a56aff; color: white; }
+    .piece {
+      width: 72%;
+      height: 72%;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      transition: transform 0.3s ease;
+    }
+    .piece.white { background: #fff; color: #4f1a68; }
+    .piece.black { background: #360a5f; color: #f7e7ff; }
+    .note {
+      font-size: 0.98rem;
+      color: #4a2a6b;
+      margin: 0;
+    }
+    footer {
+      padding: 36px 24px 46px;
+      text-align: center;
+      color: #3c1c58;
+      font-size: 0.96rem;
+    }
+    @media (max-width: 820px) {
+      header { padding: 52px 18px 26px; }
+      .demo-panel, .stack-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Digital Board Game Platform</h1>
+    <p>Welcome to your colorful internship project page for a full-stack multiplayer board game platform. This design highlights both the frontend/backend workflow and the MERN stack path, plus an automatic demo board to show gameplay in motion.</p>
+    <div class="hero-tags">
+      <span class="tag">Python + Flask</span>
+      <span class="tag">Node.js + Express</span>
+      <span class="tag">React + WebSockets</span>
+      <span class="tag">MongoDB / MySQL</span>
+      <span class="tag">RabbitMQ Messaging</span>
+    </div>
+  </header>
+  <main>
+    <section class="card">
+      <h2 class="section-title">Project Overview</h2>
+      <div class="grid grid-3">
+        <article class="stack-card">
+          <h3>Core Objective</h3>
+          <p>Create a multiplayer portal featuring Chess, Checkers, secure server-side game logic, link-based matchmaking, and interactive chat.</p>
+        </article>
+        <article class="stack-card">
+          <h3>Full-Stack Vision</h3>
+          <p>Combine a responsive React frontend with a backend API, real-time sockets, and persistent database storage to support live matches and game history.</p>
+        </article>
+        <article class="stack-card">
+          <h3>Automatic Gameplay</h3>
+          <p>Include a demo mode that shows automatic piece movement. This can act as a live preview of game rules and match flow for users and mentors.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 class="section-title">Tech Stack & Concepts</h2>
+      <div class="stack-grid">
+        <div class="stack-card">
+          <h3>Frontend</h3>
+          <ul>
+            <li>React.js UI for game lobby and board rendering</li>
+            <li>HTML/CSS for vibrant responsive styling</li>
+            <li>WebSockets for real-time board and chat updates</li>
+          </ul>
+        </div>
+        <div class="stack-card">
+          <h3>Backend</h3>
+          <ul>
+            <li>Flask / Python for game validation and secure logic</li>
+            <li>Node.js + Express for API endpoints and matchmaking</li>
+            <li>Passport.js for authentication and session handling</li>
+          </ul>
+        </div>
+        <div class="stack-card">
+          <h3>Database / Messaging</h3>
+          <ul>
+            <li>MongoDB for user data and game state in MERN mode</li>
+            <li>MySQL for structured game records in Python mode</li>
+            <li>RabbitMQ for scalable in-game chat and match events</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 class="section-title">Frontend / Backend Process</h2>
+      <div class="process">
+        <div class="process-step">
+          <h4>1. User enters lobby</h4>
+          <p>React loads the lobby page, displays active game rooms, and allows users to create or join matches.</p>
+        </div>
+        <div class="process-step">
+          <h4>2. Matchmaking request</h4>
+          <p>The frontend sends a match request to the backend. The API pairs players based on game type, skill level, and availability.</p>
+        </div>
+        <div class="process-step">
+          <h4>3. Game state update</h4>
+          <p>Moves are validated server-side with Flask/Node. WebSockets broadcast board updates and chat messages instantly to both players.</p>
+        </div>
+        <div class="process-step">
+          <h4>4. Chat + history</h4>
+          <p>Chat messages flow through RabbitMQ, while completed games are saved to MongoDB or MySQL for replay and statistics.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="highlight">
+      <h2>Want a Fully Colorful Main Project?</h2>
+      <p>This page is designed to be a showcase for your internship project with strong visual polish, clear technical structure, and an automatic gameplay demo built into the browser page itself.</p>
+    </section>
+
+    <section class="demo-panel">
+      <article class="demo-card">
+        <h2 class="section-title">Automatic Game Demo</h2>
+        <p class="note">Watch the board play itself as an example of how your platform can show automatic move replay or a demo mode.</p>
+        <div class="board-simulator" id="board"></div>
+      </article>
+      <article class="demo-card">
+        <h3>How it works</h3>
+        <p>Every 1.5 seconds the demo updates a piece move. This simulates live game progression and reinforces your platform's turn-based gameplay flow.</p>
+      </article>
+    </section>
+  </main>
+  <footer>
+    Build your MVP with frontend React, backend APIs, real-time sockets, and colorful UI. This page is now your polished project presentation for mentors and exams.</footer>
+  <script>
+    const board = document.getElementById('board');
+    const squares = [];
+    const positions = Array(64).fill(null);
+    const moves = [
+      {from: 12, to: 20, piece: '♙', color: 'white'},
+      {from: 52, to: 44, piece: '♟', color: 'black'},
+      {from: 20, to: 28, piece: '♙', color: 'white'},
+      {from: 44, to: 36, piece: '♟', color: 'black'},
+      {from: 28, to: 36, piece: '♙', color: 'white'}
+    ];
+    let moveIndex = 0;
+
+    function createBoard() {
+      for (let idx = 0; idx < 64; idx++) {
+        const cell = document.createElement('div');
+        cell.className = 'board-cell ' + ((Math.floor(idx / 8) + idx) % 2 === 0 ? 'light' : 'dark');
+        cell.dataset.index = idx;
+        board.appendChild(cell);
+        squares.push(cell);
+      }
+    }
+
+    function resetPieces() {
+      positions.fill(null);
+      positions[12] = {icon: '♙', color: 'white'};
+      positions[52] = {icon: '♟', color: 'black'};
+    }
+
+    function renderBoard() {
+      squares.forEach((cell, idx) => {
+        const spot = positions[idx];
+        cell.innerHTML = spot ? `<div class="piece ${spot.color}">${spot.icon}</div>` : '';
+      });
+    }
+
+    function nextMove() {
+      const current = moves[moveIndex];
+      if (!current) { moveIndex = 0; resetPieces(); renderBoard(); return; }
+      positions[current.to] = positions[current.from];
+      positions[current.from] = null;
+      renderBoard();
+      moveIndex = (moveIndex + 1) % moves.length;
+    }
+
+    createBoard();
+    resetPieces();
+    renderBoard();
+    setInterval(nextMove, 1500);
+  </script>
+</body>
+</html>
